@@ -87,9 +87,6 @@ module.exports = {
         message: 'Signup complete!'
       });
     });
-    if (success) {
-    localStorage.setItem("SMC_authkey", token);
-    };
   },
 
 
@@ -121,7 +118,6 @@ module.exports = {
     User.find({
       email: email
     }, (err, users) => {
-      console.log("Found user = " + users);
       if (err) {
         return res.send({
           success: false,
@@ -137,7 +133,6 @@ module.exports = {
 
       /*Having found the user, let's compare the password*/
       const user = users[0];
-      console.log("password supplied = " + password);
       if (!user.validPassword(password, user.password)) {
         return res.send({
           success: false,
@@ -168,10 +163,9 @@ module.exports = {
       localStorage.setItem("SMC_authkey", token);
     });
   },
-  /* I haven't created the "store session token" capability yet - Don't forget
-  
-  
-  
+
+
+
   //************************************************************/
   //* Verify validity of a user's token if presented 
   //************************************************************/
