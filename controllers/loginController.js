@@ -2,21 +2,14 @@ const db = require("../models");
 const User = require("../models/User")
 const UserSession = require("../models/UserSession")
 
-//*************************************************************************/
-//* This is a basic library to handle user authentication.  It uses a 
-//* MongoDB backend and requires both mongoose ODM and the bcryptjs npm 
-//* package.  
-//*************************************************************************/
-
-
 // Defining methods for the loginController
 module.exports = {
 
-
-  //************************************************************/
-  //* Allow users to self register
-  //************************************************************/
+//************************************************************/
+//* Allow users to self register
+//************************************************************/
   signUp: (req, res) => {
+//    console.log("body = " + JSON.stringify(req.body));
     const { body } = req;
     const {
       firstName,
@@ -24,6 +17,8 @@ module.exports = {
       password
     } = body;
     let { email } = body;
+
+
 
 
     if (!firstName) {
@@ -53,6 +48,7 @@ module.exports = {
     email = email.toLowerCase();
 
 
+    // checkExist: (req, res) => {
     db.User.find({
       email: email
     }, (err, exists) => {
@@ -86,19 +82,23 @@ module.exports = {
         success: true,
         message: 'Signup complete!'
       });
-    });
+
+    }
+      // }
+    )
   },
 
 
 
-  //************************************************************/
-  //* Process user Sign-in and create auth token for them
-  //************************************************************/
+//************************************************************/
+//* Process user Sign-in and create auth token for them
+//************************************************************/
   signIn: (req, res) => {
     const { body } = req;
     const { password } = body;
     let { email } = body;
 
+    console.log("email = " + email + "  password = " + password);
 
     if (!email) {
       return res.send({
@@ -114,10 +114,11 @@ module.exports = {
     };
     email = email.toLowerCase();
 
-    /*Let's see if we can find the user */
+
     User.find({
       email: email
     }, (err, users) => {
+//      console.log("Found user = " + users);
       if (err) {
         return res.send({
           success: false,
@@ -131,8 +132,9 @@ module.exports = {
         });
       };
 
-      /*Having found the user, let's compare the password*/
+
       const user = users[0];
+//      console.log("password supplied = " + password);
       if (!user.validPassword(password, user.password)) {
         return res.send({
           success: false,
@@ -141,7 +143,6 @@ module.exports = {
       };
 
 
-      /*Record a user session inthe session table*/
       const userSession = new UserSession();
       userSession.userId = user._id;
       userSession.save((err, doc) => {
@@ -153,46 +154,47 @@ module.exports = {
         };
 
 
-        /*Return success and the token from the user session*/
         return res.send({
           success: true,
           message: "User login is complete",
           token: doc._id
         });
       });
-      localStorage.setItem("SMC_authkey", token);
     });
   },
 
 
 
-  //************************************************************/
-  //* Verify validity of a user's token if presented 
-  //************************************************************/
+//************************************************************/
+//* Verify validity of a user's token if presented 
+//************************************************************/
   verify: (req, res) => {
-    const { query } = req;
-    const { token } = query;
+    const { body } = req;
+    const { token } = body;
+    // console.log(req);
+    // console.log("Token = " + token);
 
-
-    /*Let's see if we can find the user */
     UserSession.find({
       _id: token,
       isDeleted: false
     }, (err, sessions) => {
       if (err) {
+        // console.log("fail 1");
         return res.send({
           success: false,
           message: "ERROR:  Unable to obtain user token."
         });
       };
 
-      /*If you can't find the session or find too many */
+
       if (sessions.length != 1) {
+        // console.log("Session length = " + sessions.length);
         return res.send({
           success: false,
           message: "ERROR:  Unable to verify session."
         });
       } else {
+        // console.log("success 3");
         return res.send({
           success: true,
           message: "Successfully verified session token."
@@ -203,32 +205,31 @@ module.exports = {
 
 
 
-  //************************************************************/
-  //* Process logout and invalidate user token in DB 
-  //************************************************************/
+//************************************************************/
+//* Process logout and invalidate user token in DB 
+//************************************************************/
   logout: (req, res) => {
     const { query } = req;
     const { token } = query;
 
-    /*When the user elects to logout, invalidate the session token */
     UserSession.findOneAndUpdate({
       _id: token,
       isDeleted: false
     }, {
-        $set: { isDeleted: true }
-      }, null, (err, sessions) => {
-        if (err) {
-          return res.send({
-            success: false,
-            message: "ERROR:  Unable to obtain user token."
-          });
-        };
+      $set:{isDeleted:true}
+    }, null, (err, sessions) => {
+      if (err) {
+        return res.send({
+          success: false,
+          message: "ERROR:  Unable to obtain user token."
+        });
+      };
 
-        /*Send the logout message when successful */
         return res.send({
           success: true,
           message: "Successfully logged out."
         });
-      });
+      // };
+    });
   },
 };

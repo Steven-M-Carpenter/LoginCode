@@ -3,15 +3,33 @@ const router = require("express").Router();
 const loginController = require("../controllers/loginController");
 
 
-const apiRoutes = require("./api");
-
-
 // API Routes
-router.use("/api", apiRoutes);
+// Matches with "/api/signup"
+router
+  .route("/api/signup")
+  .post(loginController.signUp);
+
+
+// Matches with "/api/signin"
+router
+  .route("/api/signin")
+  .post(loginController.signIn);
+
+
+// Matches with "/api/verify"
+router
+  .route("/api/verify")
+  .post(loginController.verify);
+
+
+// Matches with "/api/logout"
+router
+  .route("/api/logout")
+  .post(loginController.logout);
 
 
 // If no API routes are hit, send the React app
-router.use(function (req, res) {
+router.use(function(req, res) {
   res.sendFile(path.join(__dirname, "../client/build/index.html"));
 });
 
