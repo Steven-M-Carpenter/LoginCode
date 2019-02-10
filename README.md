@@ -31,13 +31,15 @@ able to integrate with your code and directory setup.
 2.  Review the routes directory.  The default uses a couple of `index.js` files to funnel 
     routes to the API folder.  Determine if this fits your need or adjust as needed. The 
     `login.js` file is critical to the operation of the library and is the only file which 
-    must be required or imported from the routes directory.
+    must be required or imported from the routes directory.  Adjust the folder structure as 
+    required, but retain and route to `login.js`.
 
 3.  Review the models directory.  The library is using an `index.js` file to reference the
     `User.js` and `UserSession.js` files.  Determine if this aligns to your library 
     convention and adjust as needed.  The `User.js` and `UserSession.js` files are both
     required elements for the function library and should be integrated with your models as 
-    appropriate.
+    appropriate.  The files can be easily renamed, just propogate the names through the 
+    related code files.
 
 4.  Review the controllers directory.  The `loginController.js` file contains the methods
     to service the various authentication calls.  By default the library contains code to
@@ -47,10 +49,14 @@ able to integrate with your code and directory setup.
     Additionally, the storage key was assigned a default 
     value of `SMC_authkey` to avoid possible conflicts.  You can adjust that key to fit 
     the needs of your application.  There are 2 references to that value and both should 
-    be changed.  
+    be changed.  The key is set to use local storage to simplify testing.  Session 
+    storage is preferred for deploying apps.
 
     The messages for both success and failure which are included in the `loginController.js`
-    file will work as provided or  can be tailored to your specific needs.
+    file will work as provided or can be tailored to your specific needs.  The returned
+    status codes are not yet being set so expect to recieve 200 routinely.  Each response
+    will contain an object with a boolean value assigned to the `success` key which can be
+    interrogated for the result of the operation. 
 
 5.  Be sure the `mongoose` and `bcryptjs` libraries are installed on the server side of
     your application.  These can be installed using either of the following commands:
@@ -66,8 +72,8 @@ able to integrate with your code and directory setup.
 This library is maintained in the public GitHub repository listed below. It is free for use
 in your own projects and may be adapted or altered in any way to suit your purposes.  The 
 only requests made of the users of this library are:
-1.  You retain the provided Developer.md file within your models library.
-2.  Maybe give it a star in my repository if it helps you.
+
+1.  Maybe give it a star in my repository if it helps you.
 
     https://github.com/Steven-M-Carpenter/LoginCode.git 
 
